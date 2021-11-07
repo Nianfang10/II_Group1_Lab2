@@ -14,6 +14,11 @@ import numpy as np
 import os
 import pdb
 import torch
+import cv2
+from skimage import io, transform, color, measure, segmentation, morphology, feature
+from sklearn import svm, multiclass, model_selection
+from skimag.feature import local_binary_pattern
+
 class SatelliteSet(VisionDataset):
 
     def __init__(self, windowsize=128, split='train'):
@@ -107,7 +112,57 @@ class SatelliteSet(VisionDataset):
             NIR_4_c = np.copy(h5["NIR_4"])
             NIR_4_c[:,7980:,7980:] = 0
             self.NIR_4 = NIR_4_c
-            
+    
+    # HSV   
+    def HSV(input):
+        img_bgr =np.array(input[:,:,2],input[:,:,1],input[:,:,0])
+        img_hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
+        return img_hsv
+    
+    def LAB(input):
+        img_bgr =np.array(input[:,:,2],input[:,:,1],input[:,:,0])      
+        img_lab = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2LAB)
+        return img_lab
+    #Define a function to find the third-order color moments
+    '''def var(x = None):
+        mid = bp.mean(((x-x.mean())**3))
+        return np.sign(mid)*abs(mid)**(1/3)'''
+    #sobeldetection
+    def SOBEL(input):
+        img_bgr =np.array(input[:,:,2],input[:,:,1],input[:,:,0])       
+        img_gray =cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+        img_blur = cv2.GaussianBlur(img_gray,(3,3),0)
+        sobelx = cv2.Sobel(src = img_blur, ddepth = cv2.CV_64F, dx = 1, dy = 0, ksize = 5)
+        sobely = cv2.Sobel(src = img_blur, ddepth = cv2.CV_64F, dx = 0, dy = 1, ksize = 5)
+        sobelxy= cv2.Sobel(src = img_blur, ddepth = cv2.CV_64F, dx = 1, dy = 1, ksize = 5)
+        sobelall = np.array([sobelx,sobely,sobelxy])
+        return sobelall
+    
+    def PREWITT(input):
+        img_bgr =np.array(input[:,:,2],input[:,:,1],input[:,:,0])       
+        img_gray =cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+        kernelx = np.array([[1,1,1],[0,0,0],[-1,-1,-1]],dtype = int)
+        kernely = np.array([[-1,0,1],[-1,0,1],[-1,0,1]],dtype = int)
+        x = cv2.filter2D(img_gray, cv2.CV_165, kernelx)
+        y = cv2.filter2D(img_gray, cv2.CV_165, kernely)
+        absX = cv2.convertScaleAbs(x)
+        absY = cv2.convertScaleAbs(y)
+        Prewitt = cv2.addWeighted(absX, 0.5, absY, 0.5, 0)
+        return Prewitt
+    
+    #local binary pattern
+    def LBP(input):
+        radius = 1
+        n_points = 8
+       #image = np.array(input[:,:,0],input[:,:,1],input[:,:,2])
+        img_bgr =np.array(input[:,:,2],input[:,:,1],input[:,:,0])       
+        img_gray =cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+       #lbp = local_binary_pattern(img_gray,n_points, radius)
+        lbp = np.copy(input)
+        for channel in (0,1,2,3):
+            lbp[:,:,channel] = local_binary_pattern(input[:,:,channel],n_points,radius)
+        return lbp
+    
 
     def __getitem__(self, index):
         if not self.has_data:
