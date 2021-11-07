@@ -8,6 +8,7 @@ import os
 import pdb
 import torch
 class SatelliteSet(VisionDataset):
+    
 
     def __init__(self, windowsize=128, split='train'):
         self.wsize = int(windowsize)
@@ -30,22 +31,7 @@ class SatelliteSet(VisionDataset):
     # Windows cannot pass the h5 file to sub-processes, so each process must access the file itself.
     def load_data(self,b):
         h5 = h5py.File(self.data_path, 'r')
-        # self.CLD = [h5["CLD_1"],h5["CLD_2"],h5["CLD_3"],h5["CLD_4"]]
-        # # self.CLD.append(h5["CLD_1"])
-        # # self.CLD.append(h5["CLD_2"])
-        # # self.CLD.append(h5["CLD_3"])
-        # # self.CLD.append(h5["CLD_4"])
-        # self.RGB = [h5["INPT_1"],h5["INPT_2"],h5["INPT_3"],h5["INPT_4"]]
-        # # self.RGB.append(h5["INPT_1"])
-        # # self.RGB.append(h5["INPT_2"])
-        # # self.RGB.append(h5["INPT_3"])
-        # # self.RGB.append(h5["INPT_4"])
-        # self.NIR = [h5["NIR_1"],h5["NIR_2"],h5["NIR_3"],h5["NIR_4"]]
-        # # self.NIR.append(h5["NIR_1"])
-        # # self.NIR.append(h5["NIR_2"])
-        # # self.NIR.append(h5["NIR_3"])
-        # # self.NIR.append(h5["NIR_4"])
-        # self.GT = h5['GT']
+
         if b==0:
             self.CLD = h5["CLD_1"]
             self.INPT = h5["INPT_1"]
@@ -91,18 +77,6 @@ class SatelliteSet(VisionDataset):
         RGB_sample = self.INPT[:, n:n + self.wsize, m:m + self.wsize]
         NIR_sample = self.NIR[:, n:n + self.wsize, m:m + self.wsize]
         CLD_sample = self.CLD[:, n:n + self.wsize, m:m + self.wsize]
-        # elif b == 1:
-        #     RGB_sample = self.INPT_2[:, n:n + self.wsize, m:m + self.wsize]
-        #     NIR_sample = self.NIR_2[:, n:n + self.wsize, m:m + self.wsize]
-        #     CLD_sample = self.CLD_2[:, n:n + self.wsize, m:m + self.wsize]
-        # elif b == 2:
-        #     RGB_sample = self.INPT_3[:, n:n + self.wsize, m:m + self.wsize]
-        #     NIR_sample = self.NIR_3[:, n:n + self.wsize, m:m + self.wsize]
-        #     CLD_sample = self.CLD_3[:, n:n + self.wsize, m:m + self.wsize]
-        # elif b == 3:
-        #     RGB_sample = self.INPT_4[:, n:n + self.wsize, m:m + self.wsize]
-        #     NIR_sample = self.NIR_4[:, n:n + self.wsize, m:m + self.wsize]
-        #     CLD_sample = self.CLD_4[:, n:n + self.wsize, m:m + self.wsize]
 
         GT_sample = self.GT[b, n:n + self.wsize, m:m + self.wsize]
         
@@ -181,5 +155,5 @@ if __name__ == "__main__":
             axarr[i, 0].imshow(x[i, :, :, 1])
             axarr[i, 1].imshow(x[i, :, :, -1])
             axarr[i, 2].imshow(y[i])
-        plt.show()   
+        # plt.show()   
         
