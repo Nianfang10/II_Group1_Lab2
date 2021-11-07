@@ -98,10 +98,6 @@ class SatelliteSet(VisionDataset):
         RGB_sample = np.asarray(RGB_sample, np.float16) / (2 ** 8 - 1)
         X_sample = np.concatenate([RGB_sample, np.expand_dims(NIR_sample, axis=-1)], axis=-1)
 
-        
-        
-
-
         #padding
         sh_x, sh_y = np.shape(GT_sample)
         pad_x, pad_y = 0, 0
