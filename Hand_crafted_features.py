@@ -20,12 +20,13 @@ def LAB(input):
     return np.sign(mid)*abs(mid)**(1/3)'''
 #sobeldetection
 def SOBEL(input):
-    img_bgr =np.array(input[:,:,2],input[:,:,1],input[:,:,0])       
-    img_gray =cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
-    img_blur = cv2.GaussianBlur(img_gray,(3,3),0)
-    sobelx = cv2.Sobel(src = img_blur, ddepth = cv2.CV_64F, dx = 1, dy = 0, ksize = 5)
-    sobely = cv2.Sobel(src = img_blur, ddepth = cv2.CV_64F, dx = 0, dy = 1, ksize = 5)
-    sobelxy= cv2.Sobel(src = img_blur, ddepth = cv2.CV_64F, dx = 1, dy = 1, ksize = 5)
+    #img_bgr =np.array(input[:,:,2],input[:,:,1],input[:,:,0])       
+    #img_gray =cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    #img_blur = cv2.GaussianBlur(img_gray,(3,3),0)
+    img_rgb =np.array(input[:,:,0],input[:,:,1],input[:,:,2])
+    sobelx = cv2.Sobel(img_rgb, -1, 1, 0, ksize=3)
+    sobely = cv2.Sobel(img_rgb, -1, 0, 1, ksize=3)
+    sobelxy= cv2.Sobel(img_rgb, -1, 1, 1, ksize=3)
     sobelall = np.array([sobelx,sobely,sobelxy])
     return sobelall
 
@@ -110,4 +111,4 @@ def getGLCM(data_win):
     v = glcm_v[:, :, 0, 0]
     diag = glcm_45[:, :, 0, 0]
     joint = np.array([h, v, diag])  # return a 3*winsize*winsize matrix
-    return joint        
+    return joint
