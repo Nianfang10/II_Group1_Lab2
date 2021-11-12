@@ -39,6 +39,14 @@ def PREWITT(input):
     img_gray =cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2GRAY)
     #output = img_gray.copy()
     W, H = img_gray.shape
+    lastrow = img_gray[-1,:]
+    img_gray = np.vstack(img_gray,lastrow)
+    img_gray = np.vstack(img_gray,lastrow)
+    img_gray = np.vstack(img_gray,lastrow)
+    lastcol = img_gray[:,-1]
+    img_gray = np.vstack(img_gray,lastcol)
+    img_gray = np.vstack(img_gray,lastcol)
+    img_gray = np.vstack(img_gray,lastcol)
     new_image = np.zeros((W-3, H-3))
     new_imageX = np.zeros((W-3,H-3))
     new_imageY = np.zeros((W-3,H-3))
