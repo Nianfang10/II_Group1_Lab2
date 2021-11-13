@@ -21,12 +21,23 @@ NIR_2 = h5["NIR_2"]
 NIR_3 = h5["NIR_3"]
 NIR_4 = h5["NIR_4"]
 
-rgb1 = np.zeros(3)
-for i in range(3):
+r1 = np.zeros(10980*10980*20)
+g1 = np.zeros(10980*10980*20)
+b1 = np.zeros(10980*10980*20)
+nir1 = np.zeros(10980*10980*20)
+for i in range(20):
     #input = INPT_2[:,:,:,i]
-    rgb1[i] = INPT_1[:,:,:,i].flatten()
+    #r1[i*10980*10980:(i+1)*10980*10980]= INPT_1[i,:,:,0].flatten()
+    #g1[i*10980*10980:(i+1)*10980*10980]= INPT_1[i,:,:,1].flatten()
+    #b1[i*10980*10980:(i+1)*10980*10980]= INPT_1[i,:,:,2].flatten()
+    nir1[i*10980*10980:(i+1)*10980*10980]= NIR_1[i,:,:].flatten()
     
-plt.hist(rgb1, bins = 1000,label = ['r','g','b'])
+    
+#plt.hist(rgb1, bins = 1000,label = ['r','g','b'])
+plt.hist(r1,bins = 1000,alpha = 0.3,label = 'r')
+plt.hist(g1,bins = 1000,alpha = 0.3,label = 'g')
+plt.hist(b1,bins = 1000,alpha = 0.3,label = 'b')
+plt.hist(nir1,bins = 1000,alpha = 0.3,label = 'nir')
 plt.legend(loc = 'upper right')
 plt.show
     
