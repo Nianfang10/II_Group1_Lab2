@@ -2,6 +2,7 @@
 import cv2
 import numpy as np
 from skimage.feature import greycomatrix, local_binary_pattern
+from skimage import filters
 
 
 # HSV   
@@ -37,6 +38,13 @@ def PREWITT(input):
     img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])       
     img_bgr = img_bgr.transpose((1,2,0))
     img_gray =cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2GRAY)
+    output = filters.prewitt(img_gray)
+    return output[:,:,np.newaxis]
+
+'''def PREWITT(input):
+    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])       
+    img_bgr = img_bgr.transpose((1,2,0))
+    img_gray =cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2GRAY)
     #output = img_gray.copy()
     W, H = img_gray.shape
     lastrow = img_gray[-1,:]
@@ -58,7 +66,7 @@ def PREWITT(input):
             new_imageY[i, j] = abs(np.sum(img_gray[i:i+3, j:j+3] * s_suanziY))
             new_image[i, j] = max(new_imageX[i,j] , new_imageY[i, j])
     return new_image
-
+'''
 #local binary pattern
 def LBP(input):
     radius = 1
