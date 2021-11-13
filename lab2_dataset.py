@@ -94,8 +94,12 @@ class SatelliteSet(VisionDataset):
         NIR_sample = np.sum(NIR_sample,0)/NZ2
 
         #normalize
-        NIR_sample = np.asarray(NIR_sample, np.float16) / (2 ** 8 - 1)
-        RGB_sample = np.asarray(RGB_sample, np.float16) / (2 ** 8 - 1)
+        #NIR_sample = np.asarray(NIR_sample, np.float16) / (2 ** 8 - 1)
+        #RGB_sample = np.asarray(RGB_sample, np.float16) / (2 ** 8 - 1)
+        NIR_sample = np.asarray(NIR_sample, np.float16) / (6000)
+        RGB_sample = np.asarray(RGB_sample, np.float16) / (2500)
+        NIR_sample[NIR_sample>1] = 1
+        RGB_sample[RGB_sample>1] = 1
         X_sample = np.concatenate([RGB_sample, np.expand_dims(NIR_sample, axis=-1)], axis=-1)
 
         #padding
