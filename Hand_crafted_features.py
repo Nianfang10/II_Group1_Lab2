@@ -86,6 +86,7 @@ def getNDVI(data_win):
     R = data_win[:, :, 0]
     NIR = data_win[:, :, 3]
     ndvi = (NIR - R) / (NIR + R)
+    np.seterr(divide='ignore', invalid='ignore')
     return ndvi
 
 def getMSAVI(data_win, L=1):  # for sparse vegetation area
@@ -93,6 +94,7 @@ def getMSAVI(data_win, L=1):  # for sparse vegetation area
     NIR = data_win[:, :, 3]
     # savi = ((NIR - R) / (NIR + R + L)) * (1 + L)
     msavi = (2 * NIR + 1 - np.sqrt((2 * NIR + 1)**2 - 8 * (NIR - R))) / 2
+    np.seterr(divide='ignore', invalid='ignore')
     return msavi
 
 def getVARI(data_win):
@@ -100,6 +102,7 @@ def getVARI(data_win):
     G = data_win[:, :, 1]
     B = data_win[:, :, 2]
     vari = (G - R) / (G + R - B)
+    np.seterr(divide='ignore', invalid='ignore')
     return vari
 
 def getARVI(data_win):
@@ -107,12 +110,14 @@ def getARVI(data_win):
     B = data_win[:, :, 2]
     NIR = data_win[:, :, 3]
     arvi = (NIR - (2 * R) + B) / (NIR + (2 * R) + B)
+    np.seterr(divide='ignore', invalid='ignore')
     return arvi
 
 def getGCI(data_win):
     G = data_win[:, :, 1]
     NIR = data_win[:, :, 3]
     gci = NIR / G - 1
+    np.seterr(divide='ignore', invalid='ignore')
     return gci
 
 def getSIPI(data_win):
@@ -120,6 +125,7 @@ def getSIPI(data_win):
     B = data_win[:, :, 2]
     NIR = data_win[:, :, 3]
     sipi = (NIR - B) / (NIR - R)
+    np.seterr(divide='ignore', invalid='ignore')
     return sipi
 
 def getGLCM(input):
