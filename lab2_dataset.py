@@ -14,7 +14,10 @@ class SatelliteSet(VisionDataset):
         self.wsize = int(windowsize)
         super().__init__(None)
         assert split in ['train','test','validate','small_train'], f'Split parameters "{split}" must be either "train" , "test", "validate" or "small_train". '
-        self.data_path = os.path.join('data',f'dataset_rgb_nir_{split}.hdf5')
+        if split == 'train' or 'validate':
+            self.data_path = os.path.join('../data',f'dataset_rgb_nir_train.hdf5')
+        else:
+            self.data_path = os.path.join('../data',f'dataset_rgb_nir_{split}.hdf5')
         self.num_smpls, self.sh_x, self.sh_y = 3,10980,10980  # size of each image
 
         self.pad_x = (self.sh_x - (self.sh_x % self.wsize))
@@ -22,14 +25,14 @@ class SatelliteSet(VisionDataset):
         self.sh_x = self.pad_x + self.wsize
         self.sh_y = self.pad_y + self.wsize
         # self.num_windows = 4 * self.sh_x / self.wsize * self.sh_y / self.wsize
-        self.num_windows = int(self.num_windows)
+        
         self.has_data = False
         self.split = split
         if split == 'train':
             self.num_windows = 3 * self.sh_x / self.wsize * self.sh_y / self.wsize
         elif split == 'validate':
             self.num_windows = self.sh_x / self.wsize * self.sh_y / self.wsize
-        
+        self.num_windows = int(self.num_windows)
 
     # ugly fix for working with windows
     # Windows cannot pass the h5 file to sub-processes, so each process must access the file itself.
