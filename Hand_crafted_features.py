@@ -5,15 +5,15 @@ from skimage.feature import greycomatrix, local_binary_pattern
 from skimage import filters
 
 
-# HSV   
+# HSV
 def HSV(input):
     img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
-    img_hsv = cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2HSV)    
+    img_hsv = cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2HSV)
     return img_hsv
 
 def LAB(input):
-    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])      
+    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
     img_lab = cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2LAB)
     return img_lab
@@ -23,7 +23,7 @@ def LAB(input):
     return np.sign(mid)*abs(mid)**(1/3)'''
 #sobeldetection
 def SOBEL(input):
-    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])       
+    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
     img_gray =cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2GRAY)
     #img_blur = cv2.GaussianBlur(img_gray,(3,3),0)
@@ -35,7 +35,7 @@ def SOBEL(input):
     return sobelall
 
 def PREWITT(input):
-    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])       
+    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
     img_gray =cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2GRAY)
     output = filters.prewitt(img_gray)
@@ -72,7 +72,7 @@ def LBP(input):
     radius = 1
     n_points = 8
     #image = np.array(input[:,:,0],input[:,:,1],input[:,:,2])
-    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])    
+    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
     #img_gray =cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2GRAY)
     #lbp = local_binary_pattern(img_gray,n_points, radius)
@@ -127,21 +127,3 @@ def getSIPI(data_win):
     sipi = (NIR - B) / (NIR - R)
     np.seterr(divide='ignore', invalid='ignore')
     return sipi
-
-def getGLCM(input):
-    imgBGR = np.flip(input[:, :, 0:3], -1)  # convert the channels into B, G, R
-    imgGray = cv2.cvtColor(np.float32(imgBGR), cv2.COLOR_BGR2GRAY)
-    imgGray_int = imgGray.astype('int')  # the greycomatrix function below does not allow "float" type
-
-    # calculate different glcm from different directions
-    glcm_h = greycomatrix(imgGray_int, distances=[1], angles=[0], levels=256,
-                        symmetric=False)
-    glcm_v = greycomatrix(imgGray_int, distances=[1], angles=[np.pi / 2], levels=256,
-                        symmetric=False)
-    glcm_45 = greycomatrix(imgGray_int, distances=[1], angles=[np.pi / 4], levels=256,
-                        symmetric=False)
-    h = glcm_h[:, :, 0, 0]
-    v = glcm_v[:, :, 0, 0]
-    diag = glcm_45[:, :, 0, 0]
-    joint = np.array([h, v, diag]).transpose((1, 2, 0))  # return a winsize*winsize*3 matrix
-    return joint
