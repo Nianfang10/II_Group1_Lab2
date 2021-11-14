@@ -21,10 +21,14 @@ class SatelliteSet(VisionDataset):
         self.pad_y = (self.sh_y - (self.sh_y % self.wsize))
         self.sh_x = self.pad_x + self.wsize
         self.sh_y = self.pad_y + self.wsize
-        self.num_windows = 4 * self.sh_x / self.wsize * self.sh_y / self.wsize
+        # self.num_windows = 4 * self.sh_x / self.wsize * self.sh_y / self.wsize
         self.num_windows = int(self.num_windows)
         self.has_data = False
         self.split = split
+        if split == 'train':
+            self.num_windows = 3 * self.sh_x / self.wsize * self.sh_y / self.wsize
+        elif split == 'validate':
+            self.num_windows = self.sh_x / self.wsize * self.sh_y / self.wsize
         
 
     # ugly fix for working with windows
@@ -57,7 +61,9 @@ class SatelliteSet(VisionDataset):
 
     def __getitem__(self, index):
 
-        b = index * 4 // self.num_windows
+        b = index * 3 // self.num_windows
+        if self.split == 'validate':
+            b = 3
         if not self.has_data:
             self.load_data(b)
         
@@ -94,12 +100,8 @@ class SatelliteSet(VisionDataset):
         NIR_sample = np.sum(NIR_sample,0)/NZ2
 
         #normalize
-        #NIR_sample = np.asarray(NIR_sample, np.float16) / (2 ** 8 - 1)
-        #RGB_sample = np.asarray(RGB_sample, np.float16) / (2 ** 8 - 1)
-        NIR_sample = np.asarray(NIR_sample, np.float16) / (6000)
-        RGB_sample = np.asarray(RGB_sample, np.float16) / (2500)
-        NIR_sample[NIR_sample>1] = 1
-        RGB_sample[RGB_sample>1] = 1
+        NIR_sample = np.asarray(NIR_sample, np.float16) / (2 ** 8 - 1)
+        RGB_sample = np.asarray(RGB_sample, np.float16) / (2 ** 8 - 1)
         X_sample = np.concatenate([RGB_sample, np.expand_dims(NIR_sample, axis=-1)], axis=-1)
 
         #padding
