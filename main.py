@@ -143,4 +143,5 @@ if __name__ == "__main__":
 
     # start predicting
     # reg_pre = reg.predict()
+    h5 = h5py.File('..\data\dataset_rgb_nir_test.hdf5', 'r')
 

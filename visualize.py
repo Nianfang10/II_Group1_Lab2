@@ -36,7 +36,19 @@ def evaluate(dataloader,model):
             
             true_label_list.append(y_2D)
             predict = model.predict(xgb.DMatrix(all_feat_2D))
+            predict = np.reshape(predict,(-1,1))
+            predict[y_2D==-1]=-1
             pred_label_list.append(predict)
+            
+            plt.rcParams["figure.figsize"] = (10,6)
+            f,axarr = plt.subplots(ncols=2, nrows=1)
+            axarr[0].set_title('Prediction')
+            axarr[0].imshow(np.reshape(predict,(X.shape[1],X.shape[2])))
+            axarr[1].set_title('Ground Truth')
+            axarr[1].imshow(y)
+            plt.show()
+
+
     groud_truth = np.concatenate(true_label_list)
     predict = np.concatenate(pred_label_list)
 
@@ -45,11 +57,11 @@ def evaluate(dataloader,model):
     return rmse
 
 if __name__ == "__main__":
-    model_xgb = xgb.Booster(model_file='../checkpoint/XGBoost/2021-11-16-11-07-32_lr_0.05.json')
+    model_xgb = xgb.Booster(model_file='../checkpoint/XGBoost/2021-11-16-13-55-29_lr_0.03.json')
     
     #plot the feature importance
-    ax = xgb.plot_importance(model_xgb)
-    plt.show()
+    # ax = xgb.plot_importance(model_xgb)
+    # plt.show()
     test_set = SatelliteSet(windowsize=1098, split='test')
     test_loader = torch.utils.data.DataLoader(test_set,
                                             batch_size=8,
@@ -57,6 +69,8 @@ if __name__ == "__main__":
                                             shuffle=False)
     
     evaluate(test_loader,model_xgb)
+
+
 
 
 
