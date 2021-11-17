@@ -46,10 +46,10 @@ def evaluate(dataloader,model):
 
 
 def train(dataloader,p_model,params):
-    x_batch = []
-    y_batch = []
+   
     for X,Y in tqdm(dataloader):
-        
+        x_batch = []
+        y_batch = []
         X = np.transpose(X, (0, 2, 3, 1))
         
         for i in range(X.shape[0]):
@@ -84,11 +84,11 @@ def train(dataloader,p_model,params):
         if x_batch == []:
             continue
             
-    x_batch = np.concatenate(x_batch)
-    y_batch = np.concatenate(y_batch)
-    train_data = xgb.DMatrix(x_batch,y_batch,missing=-1)
-    model = xgb.train(params,dtrain = train_data,evals=[(train_data,'train')], num_boost_round=50, xgb_model=p_model)
-    p_model = model
+        x_batch = np.concatenate(x_batch)
+        y_batch = np.concatenate(y_batch)
+        train_data = xgb.DMatrix(x_batch,y_batch,missing=-1)
+        model = xgb.train(params,dtrain = train_data,evals=[(train_data,'train')], num_boost_round=50, xgb_model=p_model)
+        p_model = model
         
         
         
