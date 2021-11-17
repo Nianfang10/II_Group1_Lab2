@@ -6,6 +6,7 @@ from skimage import filters
 from skimage.util import img_as_ubyte
 from skimage.filters.rank import entropy
 from skimage.morphology import disk
+from scipy import ndimage
 
 
 # HSV
@@ -155,6 +156,18 @@ def getSIPI(data_win):
     sipi = (NIR - B) / (NIR - R)
     np.seterr(divide='ignore', invalid='ignore')
     return sipi
+
+def getLV(data_win):
+    results = np.zeros(data_win.shape)
+    for i in range(data_win.shape[-1]):  # for each band
+        data = data_win[:, :, i]
+        win_rows, win_cols = 3, 3
+
+        win_mean = ndimage.uniform_filter(data, (win_rows, win_cols))
+        win_sqr_mean = ndimage.uniform_filter(data ** 2, (win_rows, win_cols))
+        win_var = win_sqr_mean - win_mean ** 2
+        results[:, :, i] = win_var
+     return results
 <<<<<<< HEAD
 
 
