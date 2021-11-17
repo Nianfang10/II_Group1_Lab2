@@ -120,11 +120,11 @@ if __name__ == "__main__":
             'refresh_leaf':True,
             'subsample': 0.7}
 
-    for i in tqdm(range(5)):
-        model = train(train_loader,model,params)
+    
+    model = train(train_loader,model,params)
 
     
-    evaluate(validate_loader,model)
+    
     
     
     # xgb.plot_importance(model)
@@ -132,6 +132,8 @@ if __name__ == "__main__":
     date=dt.strftime('%Y-%m-%d-%H-%M-%S')
     filename = '../checkpoint/Xgboost/new_loader' + date +'_lr_'+str(learning_rate)+ 'max_depth'+str(max_depth)+ '.json'
     model.save_model(filename)
+    model.load(filename)
+    evaluate(validate_loader,model)
     
 
 
