@@ -155,5 +155,8 @@ def getSIPI(data_win):
     sipi = (NIR - B) / (NIR - R)
     np.seterr(divide='ignore', invalid='ignore')
     return sipi
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 9ddbe4c2666540c0278ae4209af6620c799a20a3
