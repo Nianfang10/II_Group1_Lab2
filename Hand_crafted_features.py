@@ -3,17 +3,20 @@ import cv2
 import numpy as np
 from skimage.feature import greycomatrix, local_binary_pattern
 from skimage import filters
+from skimage.util import img_as_ubyte
+from skimage.filters.rank import entropy
+from skimage.morphology import disk
 
 
-# HSV   
+# HSV
 def HSV(input):
     img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
-    img_hsv = cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2HSV)    
+    img_hsv = cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2HSV)
     return img_hsv
 
 def LAB(input):
-    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])      
+    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
     img_lab = cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2LAB)
     return img_lab
@@ -23,7 +26,7 @@ def LAB(input):
     return np.sign(mid)*abs(mid)**(1/3)'''
 #sobeldetection
 def SOBEL(input):
-    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])       
+    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
     img_gray =cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2GRAY)
     #img_blur = cv2.GaussianBlur(img_gray,(3,3),0)
@@ -35,7 +38,7 @@ def SOBEL(input):
     return sobelall
 
 def PREWITT(input):
-    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])       
+    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
     img_gray =cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2GRAY)
     output = filters.prewitt(img_gray)
@@ -72,7 +75,7 @@ def LBP(input):
     radius = 1
     n_points = 8
     #image = np.array(input[:,:,0],input[:,:,1],input[:,:,2])
-    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])    
+    img_bgr =np.array([input[:,:,2],input[:,:,1],input[:,:,0]])
     img_bgr = img_bgr.transpose((1,2,0))
     #img_gray =cv2.cvtColor(np.float32(img_bgr), cv2.COLOR_BGR2GRAY)
     #lbp = local_binary_pattern(img_gray,n_points, radius)
@@ -81,6 +84,31 @@ def LBP(input):
         lbp[:,:,channel] = local_binary_pattern(input[:,:,channel],n_points,radius)
     #lbp = lbp.transpose((1, 2, 3, 0))
     return lbp
+
+
+def LEwin3(input):
+    LEwin3 = np.copy(input)
+    for channel in (0,1,2,3):
+        LEwin3[:,:,channel] = entropy(input[:,:,channel],disk(3))
+    return LEwin3
+
+def LEwin9(input):
+    LEwin9 = np.copy(input)
+    for channel in (0,1,2,3):
+        LEwin9[:,:,channel] = entropy(input[:,:,channel],disk(9))
+    return LEwin9
+
+def LER9_13(input):
+    LER9_13 = np.copy(input)
+    for channel in (0,1,2,3):
+        LER9_13[:,:,channel] = entropy(input[:,:,channel],disk(9))/entropy(input[:,:,channel],disk(13))
+    return LER9_13
+
+def LER9_21(input):
+    LER9_21 = np.copy(input)
+    for channel in (0,1,2,3):
+        LER9_21[:,:,channel] = entropy(input[:,:,channel],disk(9))/entropy(input[:,:,channel],disk(21))
+    return LER9_21
 
 def getNDVI(data_win):
     R = data_win[:, :, 0]
@@ -128,20 +156,4 @@ def getSIPI(data_win):
     np.seterr(divide='ignore', invalid='ignore')
     return sipi
 
-def getGLCM(input):
-    imgBGR = np.flip(input[:, :, 0:3], -1)  # convert the channels into B, G, R
-    imgGray = cv2.cvtColor(np.float32(imgBGR), cv2.COLOR_BGR2GRAY)
-    imgGray_int = imgGray.astype('int')  # the greycomatrix function below does not allow "float" type
 
-    # calculate different glcm from different directions
-    glcm_h = greycomatrix(imgGray_int, distances=[1], angles=[0], levels=256,
-                        symmetric=False)
-    glcm_v = greycomatrix(imgGray_int, distances=[1], angles=[np.pi / 2], levels=256,
-                        symmetric=False)
-    glcm_45 = greycomatrix(imgGray_int, distances=[1], angles=[np.pi / 4], levels=256,
-                        symmetric=False)
-    h = glcm_h[:, :, 0, 0]
-    v = glcm_v[:, :, 0, 0]
-    diag = glcm_45[:, :, 0, 0]
-    joint = np.array([h, v, diag]).transpose((1, 2, 0))  # return a winsize*winsize*3 matrix
-    return joint
