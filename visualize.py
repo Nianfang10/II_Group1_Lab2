@@ -10,12 +10,16 @@ from sklearn.metrics import mean_squared_error
 from main import getFeatures
 import xgboost as xgb
 import matplotlib.pyplot as plt
+import h5py
+import skimage.transform as transform
 
-def evaluate(dataloader,model):
+
+def evaluate_test(dataloader,model):
     print('\nstart evaluate\n')
     
     true_label_list = []
     pred_label_list = []
+    num_iter = 0
     for X,Y in tqdm(dataloader):
         X = np.transpose(X, (0, 2, 3, 1))
         
@@ -40,13 +44,15 @@ def evaluate(dataloader,model):
             predict[y_2D==-1]=-1
             pred_label_list.append(predict)
             
-            plt.rcParams["figure.figsize"] = (10,6)
-            f,axarr = plt.subplots(ncols=2, nrows=1)
-            axarr[0].set_title('Prediction')
-            axarr[0].imshow(np.reshape(predict,(X.shape[1],X.shape[2])))
-            axarr[1].set_title('Ground Truth')
-            axarr[1].imshow(y)
-            plt.show()
+            # if num_iter>2:
+            #     plt.rcParams["figure.figsize"] = (10,6)
+            #     f,axarr = plt.subplots(ncols=2, nrows=1)
+            #     axarr[0].set_title('Prediction')
+            #     axarr[0].imshow(np.reshape(predict,(X.shape[1],X.shape[2])))
+            #     axarr[1].set_title('Ground Truth')
+            #     axarr[1].imshow(y)
+            #     plt.show()
+        num_iter += 1
 
 
     groud_truth = np.concatenate(true_label_list)
@@ -57,7 +63,7 @@ def evaluate(dataloader,model):
     return rmse
 
 if __name__ == "__main__":
-    model_xgb = xgb.Booster(model_file='../checkpoint/XGBoost/2021-11-16-13-55-29_lr_0.03.json')
+    model_xgb = xgb.Booster(model_file='../checkpoint/XGBoost/new_loader2021-11-17-09-59-48_lr_0.2.json')
     
     #plot the feature importance
     # ax = xgb.plot_importance(model_xgb)
@@ -68,7 +74,15 @@ if __name__ == "__main__":
                                             num_workers=2,
                                             shuffle=False)
     
-    evaluate(test_loader,model_xgb)
+    evaluate_test(test_loader,model_xgb)
+    
+    # CLD_mask = CLD==0
+    # NIR = NIR * (CLD_mask)
+    # RGB = RGB * np.stack((CLD_mask,CLD_mask,CLD_mask),axis = 3)
+    
+    
+
+
 
 
 

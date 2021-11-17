@@ -64,9 +64,9 @@ class SatelliteSet(VisionDataset):
 
     def __getitem__(self, index):
 
-        b = index * 3 // self.num_windows
+        b = index * 3 // self.num_windows + 1
         if self.split == 'validate':
-            b = 3
+            b = 0
         elif self.split == 'test':
             b = 0
         if not self.has_data:
@@ -91,7 +91,8 @@ class SatelliteSet(VisionDataset):
 
         GT_sample = self.GT[b, n:n + self.wsize, m:m + self.wsize]
         
-        CLD_Mask = (CLD_sample!=0)
+        CLD_Mask = (CLD_sample==0)
+        NIR_sample = CLD_Mask * CLD_Mask
         CLD_Mask = np.stack((CLD_Mask,CLD_Mask,CLD_Mask),axis = 3)
         RGB_sample = RGB_sample * CLD_Mask
 
@@ -110,6 +111,9 @@ class SatelliteSet(VisionDataset):
         NIR_sample[NIR_sample>1] = 1
         RGB_sample[RGB_sample>1] = 1
         X_sample = np.concatenate([RGB_sample, np.expand_dims(NIR_sample, axis=-1)], axis=-1)
+
+        GT_sample[NIR_sample==1] = -1
+        GT_sample[NIR_sample==0] = -1
         
 
         #padding

@@ -30,7 +30,7 @@ def getFeatures(x):
 
     # hcf_list = [R, G, B, NIR, NDVI, MSAVI, VARI, ARVI, GCI, SIPI,
     #             HSV, LAB, SOBEL, PREWITT, LBP]
-    hcf_list = [R,G,B,NIR,NDVI]
+    # hcf_list = [R,G,B,NIR,NDVI]
     hcf_list = [R,G,B,NIR,NDVI,MSAVI, VARI, ARVI, GCI, SIPI, HSV, LAB]
     all_features = np.concatenate(hcf_list, axis=2)
     return all_features
@@ -144,4 +144,5 @@ if __name__ == "__main__":
     # start predicting
     # reg_pre = reg.predict()
     h5 = h5py.File('..\data\dataset_rgb_nir_test.hdf5', 'r')
+
 

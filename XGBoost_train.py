@@ -34,6 +34,8 @@ def evaluate(dataloader,model):
             
             true_label_list.append(y_2D)
             predict = model.predict(xgb.DMatrix(all_feat_2D))
+            
+            predict[y_2D[:,0]==-1] = -1
             pred_label_list.append(predict)
     groud_truth = np.concatenate(true_label_list)
     predict = np.concatenate(pred_label_list)
@@ -44,10 +46,10 @@ def evaluate(dataloader,model):
 
 
 def train(dataloader,p_model,params):
-    
+    x_batch = []
+    y_batch = []
     for X,Y in tqdm(dataloader):
-        x_batch = []
-        y_batch = []
+        
         X = np.transpose(X, (0, 2, 3, 1))
         
         for i in range(X.shape[0]):
@@ -68,8 +70,7 @@ def train(dataloader,p_model,params):
             y_2D[np.isinf(y_2D)] = -1
 
             # filter the pixels with no data
-
-            mask = y_2D!=-1
+            mask = (y_2D!=-1)
             if np.all(mask == False):
                 continue
             y_2D = y_2D[mask]
@@ -77,18 +78,17 @@ def train(dataloader,p_model,params):
             all_feat_2D = all_feat_2D[np.repeat(mask,16,axis=1)]
             all_feat_2D = np.reshape(all_feat_2D, (-1, all_features.shape[-1]))
             
-
             y_batch.append(y_2D)
             x_batch.append(all_feat_2D)
             
         if x_batch == []:
             continue
             
-        x_batch = np.concatenate(x_batch)
-        y_batch = np.concatenate(y_batch)
-        train_data = xgb.DMatrix(x_batch,y_batch,missing=-1)
-        model = xgb.train(params,dtrain = train_data,evals=[(train_data,'train')], xgb_model=p_model)
-        p_model = model
+    x_batch = np.concatenate(x_batch)
+    y_batch = np.concatenate(y_batch)
+    train_data = xgb.DMatrix(x_batch,y_batch,missing=-1)
+    model = xgb.train(params,dtrain = train_data,evals=[(train_data,'train')], num_boost_round=50, xgb_model=p_model)
+    p_model = model
         
         
         
@@ -96,9 +96,9 @@ def train(dataloader,p_model,params):
     return p_model
 
 if __name__ == "__main__":
-    dset = SatelliteSet(windowsize=4392, split='train')
+    dset = SatelliteSet(windowsize=1098, split='train')
     train_loader = torch.utils.data.DataLoader(dset,
-                                            batch_size=1,
+                                            batch_size=8,
                                             num_workers=0,
                                             shuffle=False)
     validate_set = SatelliteSet(windowsize=1098, split='validate')
@@ -113,20 +113,24 @@ if __name__ == "__main__":
     # xgb_params = {}
 
     model = None
-    learning_rate = 0.1
+    learning_rate = 0.2
+    max_depth = 3
     params = {'eta': learning_rate,
-            "max_depth": 5,
+            "max_depth": max_depth,
             'refresh_leaf':True,
             'subsample': 0.7}
 
-    model = train(train_loader,model,params)
-    # evaluate(validate_loader,model)
+    for i in tqdm(range(5)):
+        model = train(train_loader,model,params)
+
+    
+    evaluate(validate_loader,model)
     
     
-    xgb.plot_importance(model)
+    # xgb.plot_importance(model)
     dt=datetime.now()
     date=dt.strftime('%Y-%m-%d-%H-%M-%S')
-    filename = '../checkpoint/Xgboost/' + date +'_lr_'+str(learning_rate)+  '.json'
+    filename = '../checkpoint/Xgboost/new_loader' + date +'_lr_'+str(learning_rate)+ 'max_depth'+str(max_depth)+ '.json'
     model.save_model(filename)
     
 
